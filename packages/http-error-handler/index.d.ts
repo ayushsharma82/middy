@@ -2,7 +2,8 @@ import middy from '@middy/core'
 
 interface Options {
   logger?: (error: any) => void
-  fallbackMessage?: string
+  fallbackMessage?: string,
+  forceJSONResponse: boolean
 }
 
 declare function httpErrorHandler (options?: Options): middy.MiddlewareObj
