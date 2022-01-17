@@ -2,7 +2,8 @@ const { jsonSafeParse, normalizeHttpResponse } = require('@middy/util')
 
 const defaults = {
   logger: console.error,
-  fallbackMessage: null
+  fallbackMessage: null,
+  forceJSONResponse: false
 }
 
 const httpErrorHandlerMiddleware = (opts = {}) => {
@@ -33,7 +34,13 @@ const httpErrorHandlerMiddleware = (opts = {}) => {
     if (request.error?.expose) {
       request.response = normalizeHttpResponse(request.response)
       request.response.statusCode = request.error?.statusCode
-      request.response.body = request.error?.message
+      
+      let body = '';
+      if (forceJSONResponse) {
+        request.response.body = typeof jsonSafeParse(request.error?.message) === 'string' ? JSON.stringify({ message: request.error?.message || "" }) : JSON.stringify(request.error?.message || {});
+      } else {
+        request.response.body = request.error?.message
+      }
       request.response.headers['Content-Type'] =
         typeof jsonSafeParse(request.response.body) === 'string'
           ? 'text/plain'
